@@ -187,8 +187,7 @@ theorem forallAnd {α : Type} (P Q : α → Prop) :
     · intro x
       have q := h x
       exact q.right
-  · intro h
-    intro x
+  · intro h x
     constructor
     · apply h.left
     · apply h.right
@@ -387,7 +386,13 @@ def not : MyBool → MyBool
 def PropDeMorgan (P Q : Prop) :
     Not (And P Q) ↔ Or (Not P) (Not Q) := by
   constructor
-  · sorry
+  · intro h
+    by_cases p : P
+    · right
+      intro q
+      exact h ⟨p, q⟩
+    · left
+      exact p
   · rintro (np | nq) ⟨p, q⟩ <;> contradiction
 
 def myBoolDeMorgan (x y : MyBool) :

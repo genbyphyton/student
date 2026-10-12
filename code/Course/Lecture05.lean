@@ -162,6 +162,7 @@ example : MyMem 2 [1, 2, 3] := by
 example : ¬MyMem 0 [] := by
   intro h
   cases h
+
 #print List.Mem -- ∈ in
 
 -- x ∈ xs abbreviates List.Mem x xs; its constructors are head and tail.

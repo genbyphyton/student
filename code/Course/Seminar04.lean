@@ -13,21 +13,37 @@ namespace Seminar04
 
 /-- Build the derivation by hand: each `step` climbs one, `refl` is the one way to stop. -/
 theorem two_le_five_term : 2 ≤ 5 := by
-  sorry
+  apply Nat.le.step
+  apply Nat.le.step
+  apply Nat.le.step
+  apply Nat.le.refl
 
 /-- Homework ex01. The same claim, letting `constructor` choose the rule every time. -/
 theorem two_le_five : 2 ≤ 5 := by
-  sorry
+  repeat constructor
 
 /-- Induct on the number, not on a derivation — `0 ≤ n` hands you no derivation to take
 apart, so the derivation is what you have to build. -/
 theorem zero_le' (n : Nat) : 0 ≤ n := by
-  sorry
+  induction n with
+  | zero => apply Nat.le.refl
+  | succ k ih => exact Nat.le.step ih
 
 /-- Homework ex03. Induct on `m`, then take the hypothesis apart with `cases h with`.
 One of the cases closes on its own, because no rule can conclude `n + 1 ≤ 0`. -/
 theorem le_of_succ_le_succ (n m : Nat) : n + 1 ≤ m + 1 → n ≤ m := by
-  sorry
+  intro h
+  induction m with
+  | zero =>
+    cases h
+    · exact Nat.le.refl
+    · rename_i p
+      cases p
+  | succ x ih =>
+    cases h
+    · exact Nat.le.refl
+    · rename_i p
+      apply Nat.le.step (ih p)
 
 /-- The homework's `myMax`, with `≤` where the homework has `isLe`. -/
 def myMax (n m : Nat) : Nat :=
@@ -37,7 +53,13 @@ def myMax (n m : Nat) : Nat :=
 `if`, each carrying the hypothesis that put it there — `‹n ≤ m›` names it back.
 `Nat.le_of_not_le` closes the other branch. -/
 theorem le_myMax (n m : Nat) : n ≤ myMax n m ∧ m ≤ myMax n m := by
-  sorry
+  unfold myMax
+  split
+  · rename_i p
+    exact ⟨p, Nat.le.refl⟩
+  · rename_i p
+    exact ⟨Nat.le.refl, Nat.le_of_not_le p⟩
+
 
 -- ## Round 2 — a new rule set: stamps
 
@@ -50,42 +72,55 @@ inductive Buyable : Nat → Prop where
 
 /-- One stamp. Write the term. -/
 theorem buyable_three : Buyable 3 :=
-  sorry
+  .add3 .zero
 
 /-- Three stamps. Write the term. -/
 theorem buyable_nine : Buyable 9 :=
-  sorry
+  .add3 (.add3 (.add3 .zero))
 
 -- The lecture's search — `MyOdd 5`, `CollatzFinite 6` — closes this one.
 example : Buyable 9 := by
   repeat first | exact Buyable.zero | apply Buyable.add3 | apply Buyable.add5
 
 /-- The same search on 13 fails. Run it, read the goal it gives up on, and say why.
-Then prove this: as a term, or with a tactic that backtracks (`solve_by_elim` takes the
+Then prove this: as a term, or wsorryith a tactic that backtracks (`solve_by_elim` takes the
 rules as a list). -/
-theorem buyable_thirteen : Buyable 13 :=
-  sorry
+theorem buyable_thirteen : Buyable 13 := by
+  solve_by_elim [Buyable.add3, Buyable.add5]
 
 -- ## Round 3 — take a derivation apart
 
 /-- `intro`, then `cases`: which of the three rules could have concluded `Buyable 1`? -/
 theorem not_buyable_one : ¬ Buyable 1 := by
-  sorry
+  intro h
+  cases h
 
 /-- The same, one level deeper. -/
 theorem not_buyable_four : ¬ Buyable 4 := by
-  sorry
+  intro h
+  cases h
+  · rename_i h1
+    cases h1
 
 /-- The same again, except the first `cases` leaves two branches this time, because two
 rules can conclude `Buyable 7`. Draw the tree before you write it. -/
 theorem not_buyable_seven : ¬ Buyable 7 := by
-  sorry
+  intro h
+  cases h with
+  | add3 h4 =>
+    cases h4 with
+    | add3 h1 => cases h1
+  | add5 h2 => cases h2
+
 
 -- ## Round 4 — induct over a derivation, and compare with a formula
 
 /-- `induction hm` — on the derivation, not on `m`. The shape of the lecture's `even_add`. -/
 theorem buyable_add (n m : Nat) (hn : Buyable n) (hm : Buyable m) : Buyable (n + m) := by
-  sorry
+  induction hm with
+  | zero => simpa using hn
+  | add3 _ ih =>
+  | sorry
 
 theorem buyable_three_mul (a : Nat) : Buyable (3 * a) := by
   sorry

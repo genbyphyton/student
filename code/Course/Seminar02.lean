@@ -15,7 +15,7 @@ in written above it. Write the same proof with tactics.
 
 -- term: ⟨⟨h.left, h.right.left⟩, h.right.right⟩
 theorem andAssocBack {A B C : Prop} (h : A ∧ (B ∧ C)) : (A ∧ B) ∧ C := by
-  sorry
+
 
 -- term: ⟨fun na b => na (hab.mpr b), fun nb a => nb (hab.mp a)⟩
 theorem iffNotCongr {A B : Prop} (hab : A ↔ B) : ¬A ↔ ¬B := by

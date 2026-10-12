@@ -17,119 +17,141 @@ Every `example` below is a required behaviour of the definition above it.
 -- ## Round 1 — a list against itself
 
 /-- Each element paired with the element right after it. -/
-def adjacentPairs (xs : List α) : List (α × α) := sorry
+def adjacentPairs (xs : List α) : List (α × α) :=
+  xs.zip xs.tail
 
 example : adjacentPairs [1, 2, 3] = [(1, 2), (2, 3)] := by
-  sorry
+  rfl
 
 example : adjacentPairs [7] = [] := by
-  sorry
+  rfl
 
 /-- The number of positions whose next element is strictly larger. -/
-def countRises (xs : List Int) : Nat := sorry
+def countRises (xs : List Int) : Nat :=
+  ((adjacentPairs xs).filter (fun (a, b) => a < b)).length
 
 example : countRises [1, 3, 2, 5, 5, 6] = 3 := by
-  sorry
+  rfl
 
 example : countRises [4, 3, 2] = 0 := by
-  sorry
+  rfl
 
 /-- Entry `i` is the largest of the first `i + 1` elements of `xs`. -/
-def runningMax (xs : List Nat) : List Nat := sorry
+def runningMax (xs : List Nat) : List Nat :=
+  (xs.scanl max 0).tail
 
 example : runningMax [3, 1, 4, 1, 5, 2] = [3, 3, 4, 4, 5, 5] := by
-  sorry
+  rfl
 
 example : runningMax [] = [] := by
-  sorry
+  rfl
 
 /-- ★ The elements strictly larger than both of their neighbours, in order.
 The first and last elements have only one neighbour and are never included. -/
-def localMaxima (xs : List Int) : List Int := sorry
+def localMaxima (xs : List Int) : List Int :=
+  ((xs.zip xs.tail).zip xs.tail.tail).filterMap
+    (fun ((a, b), c) => if a < b ∧ b > c then some b else none)
 
 example : localMaxima [1, 5, 2, 2, 7, 3, 9] = [5, 7] := by
-  sorry
+  rfl
 
 example : localMaxima [1, 2, 2, 1] = [] := by
-  sorry
+  rfl
 
 -- ## Round 2 — generating lists
 
 /-- The `n × n` multiplication table: row `i`, column `j` holds `i * j`,
 for `1 ≤ i ≤ n` and `1 ≤ j ≤ n`. -/
-def timesTable (n : Nat) : List (List Nat) := sorry
+def timesTable (n : Nat) : List (List Nat) :=
+  (List.range' 1 n).map fun i =>
+    (List.range' 1 n).map fun j => i * j
 
 example : timesTable 3 = [[1, 2, 3], [2, 4, 6], [3, 6, 9]] := by
-  sorry
+  rfl
 
 example : timesTable 0 = [] := by
-  sorry
+  rfl
 
 /-- The positive divisors of `n` in increasing order; `0` has none here. -/
-def divisors (n : Nat) : List Nat := sorry
+def divisors (n : Nat) : List Nat :=
+  (List.range' 1 n).filter (fun d => n % d = 0)
 
 example : divisors 12 = [1, 2, 3, 4, 6, 12] := by
-  sorry
+  rfl
 
 example : divisors 0 = [] := by
-  sorry
+  rfl
 
 /-- The perfect numbers below `n` in increasing order: positive `m` whose
 divisors other than `m` itself add up to `m`. -/
-def perfectBelow (n : Nat) : List Nat := sorry
+def perfectBelow (n : Nat) : List Nat :=
+  (List.range' 1 (n-1)).filter (fun d => (divisors d).sum - d = d)
 
-example : perfectBelow 30 = [6, 28] := by
-  sorry
+example : perfectBelow 30 = [6, 28] := by rfl
 
 /-- ★ All pairs `(a, b)` with `1 ≤ a ≤ b` and `a * a + b * b = n`, ordered by `a`. -/
-def twoSquares (n : Nat) : List (Nat × Nat) := sorry
+def twoSquares (n : Nat) : List (Nat × Nat) :=
+  (List.range' 1 n).flatMap fun a =>
+    (List.range' 1 n).filterMap fun b =>
+      if a ≤ b ∧ a * a + b * b = n then some (a, b) else none
 
 example : twoSquares 50 = [(1, 7), (5, 5)] := by
-  sorry
+  rfl
 
 example : twoSquares 65 = [(1, 8), (4, 7)] := by
-  sorry
+  rfl
 
 example : twoSquares 3 = [] := by
-  sorry
+  rfl
 
 -- ## Round 3 — folds that carry state
 
 /-- The number of elements, their sum and their maximum (`0` for `[]`).
 The definition is a single `List.foldl` over `xs`. -/
-def stats (xs : List Nat) : Nat × Nat × Nat := sorry
+def stats (xs : List Nat) : Nat × Nat × Nat :=
+  xs.foldl (fun (c, s, m) x => (c + 1, s + x, max m x)) (0, 0, 0)
 
 example : stats [3, 1, 4, 1, 5] = (5, 14, 5) := by
-  sorry
+  rfl
 
 example : stats [] = (0, 0, 0) := by
-  sorry
+  rfl
 
 /-- Whether the parentheses in `cs` are balanced: no prefix closes more than it
 has opened, and the whole list closes everything it opens. Characters other
 than `(` and `)` are ignored. The definition is a single `List.foldl` over `cs`. -/
-def balanced (cs : List Char) : Bool := sorry
+def balanced (cs : List Char) : Bool :=
+  cs.foldl
+    (fun st c =>
+      match st with
+      | none => none
+      | some n =>
+        if c = '(' then some (n + 1)
+        else if c = ')' then (if n = 0 then none else some (n - 1))
+        else some n)
+  (some 0) == some 0
 
 example : balanced "(()())".toList = true := by
-  sorry
+  rfl
 
 example : balanced "(a)(b)".toList = true := by
-  sorry
+  rfl
 
 example : balanced "".toList = true := by
-  sorry
+  rfl
 
 example : balanced "(()".toList = false := by
-  sorry
+  rfl
 
 example : balanced ")(".toList = false := by
-  sorry
+  rfl
 
 example : balanced "())(()".toList = false := by
-  sorry
+  rfl
 
 /-- Replace each run of equal adjacent elements by a single copy. -/
-def dedupAdjacent [DecidableEq α] (xs : List α) : List α := sorry
+def dedupAdjacent [DecidableEq α] (xs : List α) : List α :=
+  sorry
 
 example : dedupAdjacent [1, 1, 2, 2, 2, 1, 3, 3] = [1, 2, 1, 3] := by
   sorry
