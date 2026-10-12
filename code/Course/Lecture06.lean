@@ -271,10 +271,13 @@ theorem sumEvenSquaresLoop_eq_sumEvenSquares (xs : List Nat) :
 /-! ## Pythagorean triples -/
 
 -- All `(a, b, c)` with `0 < a < b < c < n` and `a * a + b * b = c * c`, ordered by `c`, then `b`.
-def pythagoreanTriples (n : Nat) : List (Nat × Nat × Nat) := by
-  sorry
+def pythagoreanTriples (n : Nat) : List (Nat × Nat × Nat) :=
+  (List.range' 1 (n - 1)).flatMap fun c =>
+    (List.range' 1 (c - 1)).flatMap fun b =>
+      (List.range' 1 (b - 1)).filterMap fun a =>
+        if a * a + b * b = c * c then some (a, b, c) else none
 
 example : pythagoreanTriples 14 = [(3, 4, 5), (6, 8, 10), (5, 12, 13)] := by
-  sorry
+  rfl
 
 end Lecture06

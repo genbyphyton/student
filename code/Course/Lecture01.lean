@@ -70,9 +70,14 @@ theorem orSymm {A B : Prop} : A ∨ B → B ∨ A
     | .inl a => .inr a
     | .inr b => .inl b
 
-theorem orAssoc {A B C : Prop} : (A ∨ B) ∨ C → A ∨ (B ∨ C) := sorry
+theorem orAssoc {A B C : Prop} : (A ∨ B) ∨ C → A ∨ (B ∨ C)
+    | .inl (.inl a) => .inl a
+    | .inl (.inr b) => .inr (.inl b)
+    | .inr c => .inr (.inr c)
 
-theorem andDistribOr {A B C : Prop} : A ∧ (B ∨ C) → A ∧ B ∨ A ∧ C := sorry
+theorem andDistribOr {A B C : Prop} : A ∧ (B ∨ C) → A ∧ B ∨ A ∧ C
+    | ⟨a, .inl b⟩ => .inl ⟨a, b⟩
+    | ⟨a, .inr c⟩ => .inr ⟨a, c⟩
 
 -- ## False and negation
 
@@ -86,17 +91,19 @@ theorem notFalse : ¬False := fun fls => fls
 theorem absurdLive {A C : Prop} : A → ¬A → C :=
     fun a na => False.elim (na a)
 
-theorem notNotIntro {A : Prop} : A → ¬¬A := fun a na => sorry
+theorem notNotIntro {A : Prop} : A → ¬¬A := fun a na => na a
 
-theorem notNotElim {A : Prop} : ¬¬A → A := fun nna => sorry
+theorem notNotElim {A : Prop} : ¬¬A → A := fun nna => Classical.byContradiction nna
 
 -- ## Iff
 
 theorem iffRefl {A : Prop} : A ↔ A := ⟨fun x => x, fun x => x⟩
 
-theorem iffAsPair {A B : Prop} : (A ↔ B) → (A → B) ∧ (B → A) := sorry
+theorem iffAsPair {A B : Prop} : (A ↔ B) → (A → B) ∧ (B → A) :=
+    fun a_iff_b => ⟨a_iff_b.mp, a_iff_b.mpr⟩
 
-theorem notIsArrow {A : Prop} : ¬A ↔ (A → False) := sorry
+theorem notIsArrow {A : Prop} : ¬A ↔ (A → False) :=
+    ⟨fun na => na, fun f => f⟩
 
 
 -- ## Knights and Knaves
