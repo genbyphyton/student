@@ -161,17 +161,22 @@ example : dedupAdjacent ([] : List Nat) = [] := by
 
 /-- An account starts at `start`, and each move is added to it in turn.
 The list holds the balance before any move, then the balance after each move. -/
-def balances (start : Int) (moves : List Int) : List Int := sorry
+def balances (start : Int) (moves : List Int) : List Int :=
+  moves.scanl (· + ·) start
 
 example : balances 10 [-3, 5, -20] = [10, 7, 12, -8] := by
-  sorry
+  rfl
 
 example : balances 4 [] = [4] := by
-  sorry
+  rfl
 
 theorem foldl_add_start (a : Nat) (xs : List Nat) :
     xs.foldl (· + ·) a = a + xs.sum := by
-  sorry
+  induction xs generalizing a with
+  | nil => rfl
+  | cons x xs ih =>
+    simp only [List.foldl_cons, List.sum_cons, ih]; omega
+
 
 -- ## Round 4 — combinators that return `Option`
 
@@ -189,7 +194,8 @@ theorem foldl_add_start (a : Nat) (xs : List Nat) :
 #eval (none : Option Nat).getD 0
 
 /-- The values of the decimal digit characters in `cs`, in order. -/
-def digitsIn (cs : List Char) : List Nat := sorry
+def digitsIn (cs : List Char) : List Nat :=
+  sorry
 
 example : digitsIn "a1b22c".toList = [1, 2, 2] := by
   sorry
